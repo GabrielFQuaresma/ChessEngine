@@ -7,10 +7,3 @@
     background-color: #779556
 }
 
-#chessboard .tile{
-    width: 75px;
-}
-
-#chessboard .white-tile{
-    background-color: #ebecd0;
-}
