@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 
 import './Chessboard.css'
 import Tile from '../Tile';
@@ -33,18 +33,99 @@ interface Piece{
     y: number;
 }
 
+const initialBoardState: Piece[] = [];
+
+
+
 let pieces: Piece[] = [];
 
 export default function Chessboard() {
+
+    setInitialState();
+
+    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
+    const [gridX, setGridX] = useState(0);
+    const [gridY, setGridY] = useState(0);
+    const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
+    const chessboardRef = useRef<HTMLDivElement>(null);
+    
+    function dropPiece(e: React.MouseEvent){
+        const chessboard = chessboardRef.current;
+        if(activePiece && chessboard){
+            const positionX = Math.floor((600 - (e.clientX - chessboard.offsetLeft))/75);
+            const positionY = Math.floor((600 - (e.clientY - chessboard.offsetTop))/75);
+            console.log(positionX, positionY)
+            
+            setPieces(value => {
+                const pieces = value.map((p => {
+                    if(p.x === gridX && p.y === gridY){
+                        p.x = positionX;
+                        p.y = positionY;
+                    }
+                    return p;
+                }))
+                return pieces;
+            })
+            setActivePiece(null);
+        } 
+    }
+
+    function movePiece(e: React.MouseEvent){
+        const chessboard = chessboardRef.current;
+        if(activePiece && chessboard){
+            const minX = chessboard.offsetLeft - 20;
+            const minY = chessboard.offsetTop - 20;
+
+            const maxX = chessboard.offsetLeft + chessboard.clientWidth - 50;
+            const maxY = chessboard.offsetTop + chessboard.clientHeight  - 50;
+
+            const x = e.clientX - 30;
+            const y = e.clientY - 30;
+            
+            activePiece.style.position = "absolute";
+
+            if(x < minX) activePiece.style.left = `${minX}px`;
+            else if (x > maxX) activePiece.style.left = `${maxX}px`;
+            else activePiece.style.left = `${x}px`;
+            
+            if(y < minY) activePiece.style.top = `${minY}px`;
+            else if (y > maxY) activePiece.style.top = `${maxY}px`;
+            else activePiece.style.top = `${y}px`;
+        
+
+            
+        }
+    }
+
+    function grabPiece(e: React.MouseEvent){
+        const element = e.target as HTMLElement;
+        const chessboard = chessboardRef.current;
+        if(element.classList.contains("chess-piece") && chessboard){
+            setGridX(Math.floor((600 - (e.clientX - chessboard.offsetLeft))/75));
+            setGridY(Math.floor((600 - (e.clientY - chessboard.offsetTop))/75));
+
+            const x = e.clientX - 30;
+            const y = e.clientY - 30;
+
+
+            element.style.position = "absolute";
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+
+            setActivePiece(element);
+        }
+    }
+
+
     let board = [];
 
-    setPieces();
+   
 
     for (let i = verticalAxis.length - 1; i >= 0; i--){
-        for (let j = 0; j < horizontalAxis.length; j++) {
+        for (let j = horizontalAxis.length - 1; j >= 0; j--) {
             const coordinate = j + i;
             let image = undefined;
-
+            
             pieces.forEach(p => {
                 if(p.x === j && p.y === i){
                     image = p.image
@@ -59,141 +140,114 @@ export default function Chessboard() {
             onMouseMove={e => movePiece(e)} 
             onMouseDown={e => grabPiece(e)}
             onMouseUp={e => dropPiece(e)}
-            id="chessboard">
+            id="chessboard"
+            ref = {chessboardRef}
+            >
              {board}
         
         </div>);
 
 }
 
-let activePiece:HTMLElement | null = null;
-
-function dropPiece(e: React.MouseEvent){
-    if(activePiece) activePiece = null
-}
-
-function movePiece(e: React.MouseEvent){
-    const element = e.target as HTMLElement;
-    if(activePiece){
-
-        const x = e.clientX - 30;
-        const y = e.clientY - 30;
-        
-        activePiece.style.position = "absolute";
-        activePiece.style.left = `${x}px`
-        activePiece.style.top = `${y}px`
-
-        
-    }
-}
-
-function grabPiece(e: React.MouseEvent){
-    const element = e.target as HTMLElement;
-    if(element.classList.contains("chess-piece")){
-
-        const x = e.clientX - 30;
-        const y = e.clientY - 30;
 
 
-        element.style.position = "absolute";
-        element.style.left = `${x}px`
-        element.style.top = `${y}px`
-
-        activePiece = element;
-    }
-}
-
-export function setPieces() {
+export function setInitialState() {
     // Setting Black pieces
     for (let i = 0; i < 8; i++) {
         // Black Pawns
-        pieces.push({ image: "assets/images/b_pawn.png", x: i, y: 6 });
+        initialBoardState.push({ image: "assets/images/b_pawn.png", x: i, y: 6 });
         setBitboard(6, i, PiecesName.Black);
         setBitboard(6, i, PiecesName.BlackPawn);
 
         // White Pawns
-        pieces.push({ image: "assets/images/w_pawn.png", x: i, y: 1 });
+        initialBoardState.push({ image: "assets/images/w_pawn.png", x: i, y: 1 });
         setBitboard(1, i, PiecesName.White);
         setBitboard(1, i, PiecesName.WhitePawn);
     }
 
     // Black Rooks
-    pieces.push({ image: "assets/images/b_rook.png", x: 0, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_rook.png", x: 0, y: 7 });
     setBitboard(7, 0, PiecesName.Black);
     setBitboard(7, 0, PiecesName.BlackRook);
 
-    pieces.push({ image: "assets/images/b_rook.png", x: 7, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_rook.png", x: 7, y: 7 });
     setBitboard(7, 7, PiecesName.Black);
     setBitboard(7, 7, PiecesName.BlackRook);
 
     // White Rooks
-    pieces.push({ image: "assets/images/w_rook.png", x: 0, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_rook.png", x: 0, y: 0 });
     setBitboard(0, 0, PiecesName.White);
     setBitboard(0, 0, PiecesName.WhiteRook);
 
-    pieces.push({ image: "assets/images/w_rook.png", x: 7, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_rook.png", x: 7, y: 0 });
     setBitboard(0, 7, PiecesName.White);
     setBitboard(0, 7, PiecesName.WhiteRook);
 
     // Black Knights
-    pieces.push({ image: "assets/images/b_knight.png", x: 1, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_knight.png", x: 1, y: 7 });
     setBitboard(7, 1, PiecesName.Black);
     setBitboard(7, 1, PiecesName.BlackKnight);
 
-    pieces.push({ image: "assets/images/b_knight.png", x: 6, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_knight.png", x: 6, y: 7 });
     setBitboard(7, 6, PiecesName.Black);
     setBitboard(7, 6, PiecesName.BlackKnight);
 
     // White Knights
-    pieces.push({ image: "assets/images/w_knight.png", x: 1, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_knight.png", x: 1, y: 0 });
     setBitboard(0, 1, PiecesName.White);
     setBitboard(0, 1, PiecesName.WhiteKnight);
 
-    pieces.push({ image: "assets/images/w_knight.png", x: 6, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_knight.png", x: 6, y: 0 });
     setBitboard(0, 6, PiecesName.White);
     setBitboard(0, 6, PiecesName.WhiteKnight);
 
     // Black Bishops
-    pieces.push({ image: "assets/images/b_bishop.png", x: 2, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_bishop.png", x: 2, y: 7 });
     setBitboard(7, 2, PiecesName.Black);
     setBitboard(7, 2, PiecesName.BlackBishop);
 
-    pieces.push({ image: "assets/images/b_bishop.png", x: 5, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_bishop.png", x: 5, y: 7 });
     setBitboard(7, 5, PiecesName.Black);
     setBitboard(7, 5, PiecesName.BlackBishop);
 
     // White Bishops
-    pieces.push({ image: "assets/images/w_bishop.png", x: 2, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_bishop.png", x: 2, y: 0 });
     setBitboard(0, 2, PiecesName.White);
     setBitboard(0, 2, PiecesName.WhiteBishop);
 
-    pieces.push({ image: "assets/images/w_bishop.png", x: 5, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_bishop.png", x: 5, y: 0 });
     setBitboard(0, 5, PiecesName.White);
     setBitboard(0, 5, PiecesName.WhiteBishop);
 
     // Black Queen
-    pieces.push({ image: "assets/images/b_queen.png", x: 3, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_queen.png", x: 3, y: 7 });
     setBitboard(7, 3, PiecesName.Black);
     setBitboard(7, 3, PiecesName.BlackQueen);
 
     // White Queen
-    pieces.push({ image: "assets/images/w_queen.png", x: 3, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_queen.png", x: 3, y: 0 });
     setBitboard(0, 3, PiecesName.White);
     setBitboard(0, 3, PiecesName.WhiteQueen);
 
     // Black King
-    pieces.push({ image: "assets/images/b_king.png", x: 4, y: 7 });
+    initialBoardState.push({ image: "assets/images/b_king.png", x: 4, y: 7 });
     setBitboard(7, 4, PiecesName.Black);
     setBitboard(7, 4, PiecesName.BlackKing);
 
     // White King
-    pieces.push({ image: "assets/images/w_king.png", x: 4, y: 0 });
+    initialBoardState.push({ image: "assets/images/w_king.png", x: 4, y: 0 });
     setBitboard(0, 4, PiecesName.White);
     setBitboard(0, 4, PiecesName.WhiteKing);
 }
 
 
-export function setBitboard(row: number, column: number, piece: PiecesName) {
+function setBitboard(row: number, column: number, piece: PiecesName) {
+    let temp: bigint = BigInt(0);
+    temp = BigInt(1) << BigInt(8 * row + column);
+    bitboards[piece] = bitboards[piece] | temp;
+}
+
+function changeBitboard(row: number, column: number, piece: PiecesName){
     let temp: bigint = BigInt(0);
     temp = BigInt(1) << BigInt(8 * row + column);
     bitboards[piece] = bitboards[piece] | temp;
