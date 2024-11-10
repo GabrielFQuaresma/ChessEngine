@@ -3,6 +3,12 @@ import React, {useRef, useState} from 'react';
 import './Chessboard.css'
 import Tile from '../Tile';
 
+
+export enum colors{
+    white,
+    black
+}
+
 //Position in array
 enum PiecesName {
     White = 0,
