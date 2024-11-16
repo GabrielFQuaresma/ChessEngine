@@ -6,7 +6,7 @@ export default class Pawn extends PieceType{
         const x: number = this.x;
         const y: number = this.y;
         
-        const yInitial: number = (this.color == colors.white) ? 1 : 6;
+        const yInitial: number = (this.color === colors.white) ? 1 : 6;
 
         if(y === yInitial){
             if(newX === x && newY <= y + 2) return true;
