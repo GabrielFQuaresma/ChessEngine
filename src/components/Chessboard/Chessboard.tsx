@@ -1,8 +1,14 @@
 import React, {useRef, useState} from 'react';
+import { PieceType } from '../../pieces/PieceType';
 
 import './Chessboard.css'
 import Tile from '../Tile';
-
+import Pawn from '../../pieces/Pawn';
+import Rook from '../../pieces/Rook';
+import Queen from '../../pieces/Queen';
+import King from '../../pieces/King';
+import Knight from '../../pieces/Knight';
+import Bishop from '../../pieces/Bishop';
 
 export enum colors{
     white,
@@ -33,17 +39,16 @@ let bitboards: bigint[] = new Array(enumLength).fill(BigInt(0));
 const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-interface Piece{
-    image: string;
-    x: number;
-    y: number;
-}
+// interface Piece{
+//     image: string;
+//     x: number;
+//     y: number;
+// }
 
-const initialBoardState: Piece[] = [];
+const initialBoardState: PieceType[] = [];
 
 
-
-let pieces: Piece[] = [];
+let pieces: PieceType[] = [];
 
 export default function Chessboard() {
 
@@ -52,7 +57,7 @@ export default function Chessboard() {
     const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
     const [gridX, setGridX] = useState(0);
     const [gridY, setGridY] = useState(0);
-    const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
+    const [pieces, setPieces] = useState<PieceType[]>(initialBoardState);
     const chessboardRef = useRef<HTMLDivElement>(null);
     
     function dropPiece(e: React.MouseEvent){
@@ -65,8 +70,14 @@ export default function Chessboard() {
             setPieces(value => {
                 const pieces = value.map((p => {
                     if(p.x === gridX && p.y === gridY){
-                        p.x = positionX;
-                        p.y = positionY;
+                        if(p.isValidMove(positionX, positionY)){
+                            p.x = positionX;
+                            p.y = positionY;
+                        }else{
+                            activePiece.style.position = 'relative';
+                            activePiece.style.removeProperty('top');
+                            activePiece.style.removeProperty('left')
+                        }
                     }
                     return p;
                 }))
@@ -158,92 +169,91 @@ export default function Chessboard() {
 
 
 export function setInitialState() {
+    
     // Setting Black pieces
     for (let i = 0; i < 8; i++) {
         // Black Pawns
-        initialBoardState.push({ image: "assets/images/b_pawn.png", x: i, y: 6 });
+        let pawn: Pawn = new Pawn(i, 6, "assets/images/b_pawn.png", colors.black);
+        initialBoardState.push(pawn);
         setBitboard(6, i, PiecesName.Black);
         setBitboard(6, i, PiecesName.BlackPawn);
-
+        
         // White Pawns
-        initialBoardState.push({ image: "assets/images/w_pawn.png", x: i, y: 1 });
+        pawn = new Pawn(i, 1, "assets/images/w_pawn.png", colors.white);
+        initialBoardState.push(pawn);
         setBitboard(1, i, PiecesName.White);
         setBitboard(1, i, PiecesName.WhitePawn);
     }
 
-    // Black Rooks
-    initialBoardState.push({ image: "assets/images/b_rook.png", x: 0, y: 7 });
-    setBitboard(7, 0, PiecesName.Black);
-    setBitboard(7, 0, PiecesName.BlackRook);
 
-    initialBoardState.push({ image: "assets/images/b_rook.png", x: 7, y: 7 });
-    setBitboard(7, 7, PiecesName.Black);
-    setBitboard(7, 7, PiecesName.BlackRook);
-
-    // White Rooks
-    initialBoardState.push({ image: "assets/images/w_rook.png", x: 0, y: 0 });
-    setBitboard(0, 0, PiecesName.White);
-    setBitboard(0, 0, PiecesName.WhiteRook);
-
-    initialBoardState.push({ image: "assets/images/w_rook.png", x: 7, y: 0 });
-    setBitboard(0, 7, PiecesName.White);
-    setBitboard(0, 7, PiecesName.WhiteRook);
-
-    // Black Knights
-    initialBoardState.push({ image: "assets/images/b_knight.png", x: 1, y: 7 });
-    setBitboard(7, 1, PiecesName.Black);
-    setBitboard(7, 1, PiecesName.BlackKnight);
-
-    initialBoardState.push({ image: "assets/images/b_knight.png", x: 6, y: 7 });
-    setBitboard(7, 6, PiecesName.Black);
-    setBitboard(7, 6, PiecesName.BlackKnight);
-
-    // White Knights
-    initialBoardState.push({ image: "assets/images/w_knight.png", x: 1, y: 0 });
-    setBitboard(0, 1, PiecesName.White);
-    setBitboard(0, 1, PiecesName.WhiteKnight);
-
-    initialBoardState.push({ image: "assets/images/w_knight.png", x: 6, y: 0 });
-    setBitboard(0, 6, PiecesName.White);
-    setBitboard(0, 6, PiecesName.WhiteKnight);
-
-    // Black Bishops
-    initialBoardState.push({ image: "assets/images/b_bishop.png", x: 2, y: 7 });
-    setBitboard(7, 2, PiecesName.Black);
-    setBitboard(7, 2, PiecesName.BlackBishop);
-
-    initialBoardState.push({ image: "assets/images/b_bishop.png", x: 5, y: 7 });
-    setBitboard(7, 5, PiecesName.Black);
-    setBitboard(7, 5, PiecesName.BlackBishop);
-
-    // White Bishops
-    initialBoardState.push({ image: "assets/images/w_bishop.png", x: 2, y: 0 });
-    setBitboard(0, 2, PiecesName.White);
-    setBitboard(0, 2, PiecesName.WhiteBishop);
-
-    initialBoardState.push({ image: "assets/images/w_bishop.png", x: 5, y: 0 });
-    setBitboard(0, 5, PiecesName.White);
-    setBitboard(0, 5, PiecesName.WhiteBishop);
-
-    // Black Queen
-    initialBoardState.push({ image: "assets/images/b_queen.png", x: 3, y: 7 });
-    setBitboard(7, 3, PiecesName.Black);
-    setBitboard(7, 3, PiecesName.BlackQueen);
-
-    // White Queen
-    initialBoardState.push({ image: "assets/images/w_queen.png", x: 3, y: 0 });
-    setBitboard(0, 3, PiecesName.White);
-    setBitboard(0, 3, PiecesName.WhiteQueen);
-
-    // Black King
-    initialBoardState.push({ image: "assets/images/b_king.png", x: 4, y: 7 });
-    setBitboard(7, 4, PiecesName.Black);
-    setBitboard(7, 4, PiecesName.BlackKing);
-
-    // White King
-    initialBoardState.push({ image: "assets/images/w_king.png", x: 4, y: 0 });
-    setBitboard(0, 4, PiecesName.White);
-    setBitboard(0, 4, PiecesName.WhiteKing);
+       // Setting Rooks
+       initialBoardState.push(new Rook(0, 7, "assets/images/b_rook.png", colors.black));
+       setBitboard(7, 0, PiecesName.Black);
+       setBitboard(7, 0, PiecesName.BlackRook);
+   
+       initialBoardState.push(new Rook(7, 7, "assets/images/b_rook.png", colors.black));
+       setBitboard(7, 7, PiecesName.Black);
+       setBitboard(7, 7, PiecesName.BlackRook);
+   
+       initialBoardState.push(new Rook(0, 0, "assets/images/w_rook.png", colors.white));
+       setBitboard(0, 0, PiecesName.White);
+       setBitboard(0, 0, PiecesName.WhiteRook);
+   
+       initialBoardState.push(new Rook(7, 0, "assets/images/w_rook.png", colors.white));
+       setBitboard(0, 7, PiecesName.White);
+       setBitboard(0, 7, PiecesName.WhiteRook);
+   
+       // Setting Knights
+       initialBoardState.push(new Knight(1, 7, "assets/images/b_knight.png", colors.black));
+       setBitboard(7, 1, PiecesName.Black);
+       setBitboard(7, 1, PiecesName.BlackKnight);
+   
+       initialBoardState.push(new Knight(6, 7, "assets/images/b_knight.png", colors.black));
+       setBitboard(7, 6, PiecesName.Black);
+       setBitboard(7, 6, PiecesName.BlackKnight);
+   
+       initialBoardState.push(new Knight(1, 0, "assets/images/w_knight.png", colors.white));
+       setBitboard(0, 1, PiecesName.White);
+       setBitboard(0, 1, PiecesName.WhiteKnight);
+   
+       initialBoardState.push(new Knight(6, 0, "assets/images/w_knight.png", colors.white));
+       setBitboard(0, 6, PiecesName.White);
+       setBitboard(0, 6, PiecesName.WhiteKnight);
+   
+       // Setting Bishops
+       initialBoardState.push(new Bishop(2, 7, "assets/images/b_bishop.png", colors.black));
+       setBitboard(7, 2, PiecesName.Black);
+       setBitboard(7, 2, PiecesName.BlackBishop);
+   
+       initialBoardState.push(new Bishop(5, 7, "assets/images/b_bishop.png", colors.black));
+       setBitboard(7, 5, PiecesName.Black);
+       setBitboard(7, 5, PiecesName.BlackBishop);
+   
+       initialBoardState.push(new Bishop(2, 0, "assets/images/w_bishop.png", colors.white));
+       setBitboard(0, 2, PiecesName.White);
+       setBitboard(0, 2, PiecesName.WhiteBishop);
+   
+       initialBoardState.push(new Bishop(5, 0, "assets/images/w_bishop.png", colors.white));
+       setBitboard(0, 5, PiecesName.White);
+       setBitboard(0, 5, PiecesName.WhiteBishop);
+   
+       // Setting Queens
+       initialBoardState.push(new Queen(3, 7, "assets/images/b_queen.png", colors.black));
+       setBitboard(7, 3, PiecesName.Black);
+       setBitboard(7, 3, PiecesName.BlackQueen);
+   
+       initialBoardState.push(new Queen(3, 0, "assets/images/w_queen.png", colors.white));
+       setBitboard(0, 3, PiecesName.White);
+       setBitboard(0, 3, PiecesName.WhiteQueen);
+   
+       // Setting Kings
+       initialBoardState.push(new King(4, 7, "assets/images/b_king.png", colors.black));
+       setBitboard(7, 4, PiecesName.Black);
+       setBitboard(7, 4, PiecesName.BlackKing);
+   
+       initialBoardState.push(new King(4, 0, "assets/images/w_king.png", colors.white));
+       setBitboard(0, 4, PiecesName.White);
+       setBitboard(0, 4, PiecesName.WhiteKing);
 }
 
 
