@@ -1,7 +1,7 @@
 import { PieceType } from "./PieceType";
 
 export default class Knight extends PieceType{
-    isValidMove(newX: number, newY: number): boolean {
+    isValidMove(newX: number, newY: number, occupied: bigint): boolean {
         const x: number = this.x;
         const y: number = this.y;
 
@@ -14,4 +14,5 @@ export default class Knight extends PieceType{
 
         return false;
     }
+
 }

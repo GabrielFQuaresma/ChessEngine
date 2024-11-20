@@ -17,20 +17,20 @@ export enum colors{
 
 //Position in array
 enum PiecesName {
-    White = 0,
-    Black = 1,
-    WhitePawn = 2,
-    WhiteKnight = 3,
-    WhiteBishop = 4,
-    WhiteRook = 5,
-    WhiteQueen = 6,
-    WhiteKing = 7,
-    BlackPawn = 8,
-    BlackKnight = 9,
-    BlackBishop = 10,
-    BlackRook = 11,
-    BlackQueen = 12,
-    BlackKing = 13
+    White,
+    Black,
+    WhitePawn,
+    WhiteKnight,
+    WhiteBishop,
+    WhiteRook,
+    WhiteQueen,
+    WhiteKing,
+    BlackPawn,
+    BlackKnight,
+    BlackBishop ,
+    BlackRook ,
+    BlackQueen ,
+    BlackKing
 }
 const enumLength = Object.keys(PiecesName).length / 2; // Dividido por 2 porque enums têm chaves e valores
 
@@ -68,9 +68,10 @@ export default function Chessboard() {
             console.log(positionX, positionY)
             
             setPieces(value => {
+                const board: bigint = bitboards[PiecesName.White] | bitboards[PiecesName.Black];
                 const pieces = value.map((p => {
                     if(p.x === gridX && p.y === gridY){
-                        if(p.isValidMove(positionX, positionY)){
+                        if(p.isValidMove(positionX, positionY, board)) {
                             p.x = positionX;
                             p.y = positionY;
                         }else{
@@ -256,15 +257,20 @@ export function setInitialState() {
        setBitboard(0, 4, PiecesName.WhiteKing);
 }
 
+function pathIsEmpty(column: number, row: number,){
 
-function setBitboard(row: number, column: number, piece: PiecesName) {
-    let temp: bigint = BigInt(0);
-    temp = BigInt(1) << BigInt(8 * row + column);
-    bitboards[piece] = bitboards[piece] | temp;
 }
 
-function changeBitboard(row: number, column: number, piece: PiecesName){
-    let temp: bigint = BigInt(0);
-    temp = BigInt(1) << BigInt(8 * row + column);
+function tileIsEmpty(row: number, column: number){
+    const board: bigint = bitboards[PiecesName.White] | bitboards[PiecesName.Black];
+    const temp: bigint = BigInt(1) << BigInt(8 * row + column); 
+    
+    const value: bigint = board & temp;
+
+    return (value === BigInt(0)) ? true : false;
+}
+
+function setBitboard(row: number, column: number, piece: PiecesName) {
+    let temp: bigint = BigInt(1) << BigInt(8 * row + column);
     bitboards[piece] = bitboards[piece] | temp;
 }

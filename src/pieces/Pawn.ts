@@ -2,7 +2,7 @@ import { PieceType } from './PieceType';
 import { colors } from "../components/Chessboard/Chessboard";
 
 export default class Pawn extends PieceType{
-    isValidMove(newX: number, newY: number): boolean {
+    isValidMove(newX: number, newY: number, occupied: bigint): boolean {
         const x: number = this.x;
         const y: number = this.y;
         
@@ -16,4 +16,5 @@ export default class Pawn extends PieceType{
         
         return false;
     }
+
 }
