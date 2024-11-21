@@ -23,6 +23,8 @@ export abstract class PieceType{
         const directionRow = Math.sign(newY - this.y);
         const directionCol = Math.sign(newX - this.x);
 
+        console.log("board: " + occupied.toString(2).padEnd(64, '0'));
+
         let currentRow = this.y + directionRow;
         let currentCol = this.x + directionCol;
 
