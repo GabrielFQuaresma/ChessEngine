@@ -95,6 +95,7 @@ export default function Chessboard() {
     }
 
     function movePiece(e: React.MouseEvent){
+        if(!activePiece) return;
         const chessboard = chessboardRef.current;
         if(activePiece && chessboard){
             const minX = chessboard.offsetLeft - 20;
