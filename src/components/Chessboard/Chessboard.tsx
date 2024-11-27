@@ -300,23 +300,11 @@ function changebitboard(row: number, column: number, piece: PieceType) {
     const oldposition: bigint = ~(BigInt(1) << BigInt(8 * piece.y + piece.x)) & fullBoardMask; 
 
 
-    // console.log("newposition: ");
-    // const newpositionboard = stringToBoardMatrix(newposition.toString(2));
-    // newpositionboard.forEach(row => console.log(row));
-    
-    // console.log("oldposition: ");
-    // const oldpositionboard = stringToBoardMatrix(oldposition.toString(2));
-    // oldpositionboard.forEach(row => console.log(row));
-
     // Atualizar bitboards
     bitboards[piece.type] = (bitboards[piece.type] | newposition) & oldposition;
     // console.log("bitboards[piece.type]: " + bitboards[piece.type].toString(2));
     
     bitboards[piece.color] = (bitboards[piece.color] | newposition) & oldposition;
-    // console.log("bitboard[piece.color]: ");
-    // const colorboard = stringToBoardMatrix(bitboards[piece.color].toString(2));
-    // colorboard.forEach(row => console.log(row));
-    // console.log("bitboards[piece.color]: " + bitboards[piece.color].toString(2));
 }
 
 function stringToBoardMatrix(bitString:string) {
