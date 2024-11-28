@@ -6,6 +6,8 @@ export default class King extends PieceType {
         const xDifference: number = Math.abs(this.x - newX);
         const yDifference: number = Math.abs(this.y - newY);
 
+        if(!(currentState.isYourTurn(this.color))) return false;
+
         if (xDifference <= 1 && yDifference <= 1) return true;
 
         return false;

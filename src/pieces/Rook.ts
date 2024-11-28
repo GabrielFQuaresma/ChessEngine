@@ -8,6 +8,8 @@ export default class Rook extends PieceType{
 
         const board = currentState.getBoard();
 
+        if(!(currentState.isYourTurn(this.color))) return false;
+
         if (!(this.isPathClean(newX, newY, board))) return false; 
 
         if (newX === x || newY === y) return true;

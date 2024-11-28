@@ -6,6 +6,8 @@ export default class Knight extends PieceType{
         const x: number = this.x;
         const y: number = this.y;
 
+        if(!(currentState.isYourTurn(this.color))) return false;
+
         if (newY === y + 2 || newY === y - 2){
           if (newX === x + 1 || newX === x - 1) return true;
         }

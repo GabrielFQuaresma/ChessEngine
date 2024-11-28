@@ -10,8 +10,9 @@ export default class Queen extends PieceType{
         const xDifference: number = Math.abs(x - newX);
         const yDifference: number = Math.abs(y - newY);
 
-
         const board = currentState.getBoard();
+
+        if(!(currentState.isYourTurn(this.color))) return false;
 
         if (!(this.isPathClean(newX, newY, board))) return false; 
 

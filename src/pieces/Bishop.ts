@@ -8,6 +8,8 @@ export default class Bishop extends PieceType{
 
         const board = currentState.getBoard();
 
+        if(!(currentState.isYourTurn(this.color))) return false;
+
         if (!(this.isPathClean(newX, newY, board))) return false; 
 
         if (xDifference === yDifference) return true;
