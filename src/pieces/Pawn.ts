@@ -1,13 +1,14 @@
 import { PieceType } from './PieceType';
 import { PiecesName } from "../components/Chessboard/Chessboard";
+import State from "../auxiliar/State";
 
 export default class Pawn extends PieceType{
-    isValidMove(newX: number, newY: number, whiteboard: bigint, blackboard: bigint): boolean {
+    isValidMove(newX: number, newY: number, currentState: State): boolean {
         const x: number = this.x;
         const y: number = this.y;
         
         const yInitial: number = (this.color === PiecesName.White) ? 1 : 6;
-        const board = whiteboard | blackboard;
+        const board = currentState.getBoard();
 
         console.log("y: " + y + " newY: " + newY );
 

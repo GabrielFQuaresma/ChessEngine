@@ -10,6 +10,8 @@ import King from '../../pieces/King';
 import Knight from '../../pieces/Knight';
 import Bishop from '../../pieces/Bishop';
 
+import State from '../../auxiliar/State';
+
 export enum colors{
     white,
     black
@@ -49,16 +51,24 @@ const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 const initialBoardState: PieceType[] = [];
 
+// interface State{
+//     boards: bigint[];
+//     currentTurn: colors;
 
+//     changeState(){
+//         currentTurn = !this.currentTurn;
+//     }
+// }
+    
 let pieces: PieceType[] = [];
-
-let atualState: colors = colors.white;
+let currentState: State;
 
 export default function Chessboard() {
     
     if(initialState){
         setInitialState();
         initialState = false;
+        currentState = new State(colors.white, bitboards);
     }
 
     const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
@@ -75,12 +85,11 @@ export default function Chessboard() {
             console.log(positionX, positionY)
             
             setPieces(value => {
-                const whiteBoard: bigint = bitboards[PiecesName.White];
-                const blackBoard: bigint = bitboards[PiecesName.Black];
                 const pieces = value.map((p => {
                     if(p.x === gridX && p.y === gridY){
-                        if(p.isValidMove(positionX, positionY, whiteBoard, blackBoard)) {
+                        if(p.isValidMove(positionX, positionY, currentState)) {
                             changebitboard(positionX, positionY, p)
+                            currentState.changeState(bitboards);
                             p.x = positionX;
                             p.y = positionY;
                         }else{

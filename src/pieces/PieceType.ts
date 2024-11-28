@@ -1,4 +1,5 @@
 import {PiecesName} from "../components/Chessboard/Chessboard"
+import State from "../auxiliar/State";
 
 export abstract class PieceType{
     x: number;
@@ -16,9 +17,9 @@ export abstract class PieceType{
     }
   
     // Método abstrato a ser implementado em subclasses
-    abstract isValidMove(newX: number, newY: number, whiteBoard: bigint, blackBoard: bigint): boolean;
+    abstract isValidMove(newX: number, newY: number, currentState: State): boolean;
 
-    // abstract isAttackPosition(newX: number, newY: number, whiteBoard: big)
+    // abstract isAnAttack(newX: number, newY: number, currentState: State): boolean;
 
     isPathClean(newX: number, newY: number, occupied: bigint): boolean {
 
