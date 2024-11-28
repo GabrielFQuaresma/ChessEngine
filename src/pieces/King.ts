@@ -1,7 +1,7 @@
 import { PieceType } from "./PieceType";
 
 export default class King extends PieceType {
-    isValidMove(newX: number, newY: number, occupied: bigint): boolean {
+    isValidMove(newX: number, newY: number, whiteboard: bigint, blackboard: bigint): boolean {
         const xDifference: number = Math.abs(this.x - newX);
         const yDifference: number = Math.abs(this.y - newY);
 

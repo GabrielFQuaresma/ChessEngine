@@ -52,6 +52,8 @@ const initialBoardState: PieceType[] = [];
 
 let pieces: PieceType[] = [];
 
+let atualState: colors = colors.white;
+
 export default function Chessboard() {
     
     if(initialState){
@@ -73,10 +75,11 @@ export default function Chessboard() {
             console.log(positionX, positionY)
             
             setPieces(value => {
-                const board: bigint = bitboards[PiecesName.White] | bitboards[PiecesName.Black];
+                const whiteBoard: bigint = bitboards[PiecesName.White];
+                const blackBoard: bigint = bitboards[PiecesName.Black];
                 const pieces = value.map((p => {
                     if(p.x === gridX && p.y === gridY){
-                        if(p.isValidMove(positionX, positionY, board)) {
+                        if(p.isValidMove(positionX, positionY, whiteBoard, blackBoard)) {
                             changebitboard(positionX, positionY, p)
                             p.x = positionX;
                             p.y = positionY;

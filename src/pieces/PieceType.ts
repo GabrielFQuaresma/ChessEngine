@@ -16,7 +16,9 @@ export abstract class PieceType{
     }
   
     // Método abstrato a ser implementado em subclasses
-    abstract isValidMove(newX: number, newY: number, occupied: bigint): boolean;
+    abstract isValidMove(newX: number, newY: number, whiteBoard: bigint, blackBoard: bigint): boolean;
+
+    // abstract isAttackPosition(newX: number, newY: number, whiteBoard: big)
 
     isPathClean(newX: number, newY: number, occupied: bigint): boolean {
 
