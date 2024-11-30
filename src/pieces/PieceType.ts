@@ -19,7 +19,20 @@ export abstract class PieceType{
     // Método abstrato a ser implementado em subclasses
     abstract isValidMove(newX: number, newY: number, currentState: State): boolean;
 
-    // abstract isAnAttack(newX: number, newY: number, currentState: State): boolean;
+    isAnAttack(newX: number, newY: number, currentState: State): boolean {
+        const x: number = this.x;
+        const y: number = this.y;
+
+        const Enemy: PiecesName = this.getEnemyColor();
+        const EnemyBoard: bigint = currentState.boards[Enemy];
+
+        const mask = BigInt(1) << BigInt( 8 * newY + newX);
+        
+        if((EnemyBoard & mask) !== BigInt(0)){
+            return true;
+        }
+        return false;
+    }
 
     isPathClean(newX: number, newY: number, occupied: bigint): boolean {
 
@@ -46,5 +59,8 @@ export abstract class PieceType{
         return true;
     }
 
+    getEnemyColor() : PiecesName{
+        return (this.color === PiecesName.White) ? PiecesName.Black : PiecesName.White;
+    }
 
 }
