@@ -12,6 +12,12 @@ import Bishop from '../../pieces/Bishop';
 
 import State from '../../auxiliar/State';
 
+
+const CHESSBOARD_SIZE = 600;
+const TILE_SIZE = CHESSBOARD_SIZE / 8;
+
+
+
 export enum colors{
     white,
     black
@@ -77,35 +83,53 @@ export default function Chessboard() {
     const [pieces, setPieces] = useState<PieceType[]>(initialBoardState);
     const chessboardRef = useRef<HTMLDivElement>(null);
     
-    function dropPiece(e: React.MouseEvent){
+    function dropPiece(e: React.MouseEvent) {
         const chessboard = chessboardRef.current;
-        if(activePiece && chessboard){
-            const positionX = Math.floor((600 - (e.clientX - chessboard.offsetLeft))/75);
-            const positionY = Math.floor((600 - (e.clientY - chessboard.offsetTop))/75);
-            console.log(positionX, positionY)
-            
-            setPieces(value => {
-                const pieces = value.map((p => {
-                    if(p.x === gridX && p.y === gridY){
-                        if(p.isValidMove(positionX, positionY, currentState)) {
-                            changebitboard(positionX, positionY, p)
+        if (activePiece && chessboard) {
+            const positionX = Math.floor((CHESSBOARD_SIZE - (e.clientX - chessboard.offsetLeft)) / TILE_SIZE);
+            const positionY = Math.floor((CHESSBOARD_SIZE - (e.clientY - chessboard.offsetTop)) / TILE_SIZE);
+    
+            // Identifica as peças envolvidas
+            const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
+            const attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY);
+    
+            if (currentPiece) {
+                const validMove = currentPiece.isValidMove(positionX, positionY, currentState);
+    
+                if (validMove) {
+                    // Atualiza as peças no estado
+                    const updatedPieces = pieces.reduce((results, piece) => {
+                        if (piece === currentPiece) {
+                            // Move a peça ativa
+                            piece.x = positionX;
+                            piece.y = positionY;
+                            results.push(piece);
+                            changebitboard(positionX, positionY, piece);
                             currentState.changeState(bitboards);
-                            p.x = positionX;
-                            p.y = positionY;
-                        }else{
-                            activePiece.style.position = 'relative';
-                            activePiece.style.removeProperty('top');
-                            activePiece.style.removeProperty('left')
+                        } else if (piece !== attackedPiece) {
+                            // Mantém as outras peças, exceto a atacada
+                            results.push(piece);
                         }
+                        return results;
+                    }, [] as PieceType[]);
+    
+                    setPieces(updatedPieces);
+                } else {
+                    // Restaura a posição inicial da peça se o movimento não for válido
+                    if (activePiece) {
+                        activePiece.style.position = 'relative';
+                        activePiece.style.removeProperty('top');
+                        activePiece.style.removeProperty('left');
                     }
-                    return p;
-                }))
-                return pieces;
-            })
+                }
+            }
+    
+            // Remove o estilo da peça ativa e redefine o estado
             setActivePiece(null);
-        } 
+        }
     }
 
+    
     function movePiece(e: React.MouseEvent){
         if(!activePiece) return;
         const chessboard = chessboardRef.current;
