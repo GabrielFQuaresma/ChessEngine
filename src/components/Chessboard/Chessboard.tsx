@@ -49,22 +49,10 @@ let initialState: boolean = true;
 const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-// interface Piece{
-//     image: string;
-//     x: number;
-//     y: number;
-// }
+
 
 const initialBoardState: PieceType[] = [];
 
-// interface State{
-//     boards: bigint[];
-//     currentTurn: colors;
-
-//     changeState(){
-//         currentTurn = !this.currentTurn;
-//     }
-// }
     
 let pieces: PieceType[] = [];
 let currentState: State;
@@ -314,15 +302,6 @@ export function setInitialState() {
     setBitboard(0, 4, PiecesName.White);
     setBitboard(0, 4, PiecesName.WhiteKing);
 
-}
-
-function tileIsEmpty(row: number, column: number){
-    const board: bigint = bitboards[PiecesName.White] | bitboards[PiecesName.Black];
-    const temp: bigint = BigInt(1) << BigInt(8 * row + column); 
-    
-    const value: bigint = board & temp;
-
-    return (value === BigInt(0)) ? true : false;
 }
 
 function setBitboard(row: number, column: number, pieceName: PiecesName) {
