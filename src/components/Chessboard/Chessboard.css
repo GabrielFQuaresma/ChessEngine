@@ -1,3 +1,23 @@
+.captured-pieces-container {
+    display: flex;
+    justify-content: start;
+    margin-bottom: 20px; /* Para as peças brancas capturadas acima do tabuleiro */
+    margin-top: 20x; /* Para as peças pretas capturadas abaixo do tabuleiro */
+}
+
+.captured-pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.captured-pieces img {
+    width: 50px;
+    height: 50px;
+}
+
 #chessboard {
     display: grid;
     grid-template-columns: repeat(8, 75px);
@@ -6,4 +26,3 @@
     height: 600px;
     background-color: #779556;
 }
-

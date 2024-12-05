@@ -69,6 +69,11 @@ export default function Chessboard() {
     const [gridX, setGridX] = useState(0);
     const [gridY, setGridY] = useState(0);
     const [pieces, setPieces] = useState<PieceType[]>(initialBoardState);
+
+    const [capturedWhitePieces, setCapturedWhitePieces] = useState<PieceType[]>([]);
+    const [capturedBlackPieces, setCapturedBlackPieces] = useState<PieceType[]>([]);
+
+
     const chessboardRef = useRef<HTMLDivElement>(null);
     
     function dropPiece(e: React.MouseEvent) {
@@ -97,6 +102,15 @@ export default function Chessboard() {
                         } else if (piece !== attackedPiece) {
                             // Mantém as outras peças, exceto a atacada
                             results.push(piece);
+                        }
+                        else{
+                            if (attackedPiece) {
+                                if (attackedPiece.color === PiecesName.White) {
+                                    setCapturedWhitePieces((prev) => [...prev, attackedPiece]);
+                                } else {
+                                    setCapturedBlackPieces((prev) => [...prev, attackedPiece]);
+                                }
+                            }
                         }
                         return results;
                     }, [] as PieceType[]);
@@ -185,16 +199,32 @@ export default function Chessboard() {
         }
     }
     return (
-        <div 
-            onMouseMove={e => movePiece(e)} 
-            onMouseDown={e => grabPiece(e)}
-            onMouseUp={e => dropPiece(e)}
-            id="chessboard"
-            ref = {chessboardRef}
+        <>
+            <div className="captured-pieces-container">
+                <div className="captured-pieces white-captured">
+                    {capturedWhitePieces.map((piece, index) => (
+                        <img key={index} src={piece.image} alt="Captured white piece" />
+                    ))}
+                </div>
+            </div>
+            <div
+                onMouseMove={movePiece}
+                onMouseDown={grabPiece}
+                onMouseUp={dropPiece}
+                id="chessboard"
+                ref={chessboardRef}
             >
-             {board}
-        
-        </div>);
+                {board}
+            </div>
+            <div className="captured-pieces-container">
+                <div className="captured-pieces black-captured">
+                    {capturedBlackPieces.map((piece, index) => (
+                        <img key={index} src={piece.image} alt="Captured black piece" />
+                    ))}
+                </div>
+            </div>
+        </>
+    );    
 
 }
 
