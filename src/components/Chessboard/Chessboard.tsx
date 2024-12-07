@@ -40,6 +40,30 @@ export enum PiecesName {
     BlackQueen ,
     BlackKing
 }
+
+export const pieceValues: Record<PiecesName, number> = {
+    [PiecesName.White]: 0,
+    [PiecesName.Black]: 0,
+    [PiecesName.WhitePawn]: 1,
+    [PiecesName.WhiteKnight]: 3,
+    [PiecesName.WhiteBishop]: 3,
+    [PiecesName.WhiteRook]: 5,
+    [PiecesName.WhiteQueen]: 9,
+    [PiecesName.WhiteKing]: Infinity, // O Rei geralmente não tem valor numérico
+    [PiecesName.BlackPawn]: 1,
+    [PiecesName.BlackKnight]: 3,
+    [PiecesName.BlackBishop]: 3,
+    [PiecesName.BlackRook]: 5,
+    [PiecesName.BlackQueen]: 9,
+    [PiecesName.BlackKing]: Infinity, // O Rei geralmente não tem valor numérico
+};
+
+let WhitePoints: number = 0;
+let BlackPoints: number = 0;
+
+let Diff: number = Math.abs(WhitePoints - BlackPoints);
+
+
 const enumLength = Object.keys(PiecesName).length / 2; // Dividido por 2 porque enums têm chaves e valores
 
 let bitboards: bigint[] = new Array(enumLength).fill(BigInt(0)); 
@@ -50,7 +74,6 @@ const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 const initialBoardState: PieceType[] = [];
-
     
 let pieces: PieceType[] = [];
 let currentState: State;
@@ -112,12 +135,17 @@ export default function Chessboard() {
                         }
                         else{
                             if (attackedPiece) {
+                                let pieceValue = pieceValues[attackedPiece.type];
                                 if (attackedPiece.color === PiecesName.White) {
+                                    WhitePoints += pieceValue;
                                     setCapturedWhitePieces((prev) => [...prev, attackedPiece!]);
                                 } else {
+                                    BlackPoints += pieceValue;
                                     setCapturedBlackPieces((prev) => [...prev, attackedPiece!]);
                                 }
                             }
+                            Diff = Math.abs(WhitePoints - BlackPoints);
+                            console.log(Diff);
                         }
                         return results;
                     }, [] as PieceType[]);
@@ -209,6 +237,7 @@ export default function Chessboard() {
         <>
             <div className="captured-pieces-container">
                 <div className="captured-pieces white-captured">
+                    {WhitePoints > BlackPoints && <span className="diff-display">{Diff}</span>}
                     {capturedWhitePieces.map((piece, index) => (
                         <img key={index} src={piece.image} alt="Captured white piece" />
                     ))}
@@ -225,13 +254,15 @@ export default function Chessboard() {
             </div>
             <div className="captured-pieces-container">
                 <div className="captured-pieces black-captured">
+                    {BlackPoints > WhitePoints && <span className="diff-display">{Diff}</span>}
                     {capturedBlackPieces.map((piece, index) => (
                         <img key={index} src={piece.image} alt="Captured black piece" />
                     ))}
                 </div>
             </div>
         </>
-    );    
+    );
+    
 
 }
 

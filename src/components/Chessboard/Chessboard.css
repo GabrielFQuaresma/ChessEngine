@@ -8,10 +8,22 @@
 .captured-pieces {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0px;
     justify-content: center;
+    position: relative;
     margin-top: 10px;
 }
+
+.diff-display {
+    font-size: 25px;
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #ffffff;
+    margin-right: 10px; /* Espaço entre o número e as peças */
+    align-self: center;
+}
+
 
 .captured-pieces img {
     width: 50px;
