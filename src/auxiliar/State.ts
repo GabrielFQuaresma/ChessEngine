@@ -17,7 +17,7 @@ export default class State{
 
     changeState(currentBoard: bigint[]){
         this.currentTurn = (this.currentTurn === colors.white) ? colors.black : colors.white;
-
+        this.boards = currentBoard;
     }
 
     getBoard(): bigint{
