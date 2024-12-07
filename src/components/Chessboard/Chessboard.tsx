@@ -49,8 +49,6 @@ let initialState: boolean = true;
 const verticalAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-
-
 const initialBoardState: PieceType[] = [];
 
     
@@ -84,21 +82,30 @@ export default function Chessboard() {
     
             // Identifica as peças envolvidas
             const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
-            const attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY);
+            let attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY);
     
+
             if (currentPiece) {
                 const validMove = currentPiece.isValidMove(positionX, positionY, currentState);
-    
+
+                //Necessário pro En Passant
+                if(!attackedPiece){
+                    if(currentPiece.isAnAttack(positionX, positionY, currentState)){
+                        const colorDiff = (currentPiece.getEnemyColor() === PiecesName.White) ? 1 : -1; 
+                        attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY + colorDiff);
+                    }
+                }
+
                 if (validMove) {
                     // Atualiza as peças no estado
                     const updatedPieces = pieces.reduce((results, piece) => {
                         if (piece === currentPiece) {
                             // Move a peça ativa
+                            changebitboard(positionX, positionY, piece);
+                            currentState.changeState(bitboards);
                             piece.x = positionX;
                             piece.y = positionY;
                             results.push(piece);
-                            changebitboard(positionX, positionY, piece);
-                            currentState.changeState(bitboards);
                         } else if (piece !== attackedPiece) {
                             // Mantém as outras peças, exceto a atacada
                             results.push(piece);
@@ -106,9 +113,9 @@ export default function Chessboard() {
                         else{
                             if (attackedPiece) {
                                 if (attackedPiece.color === PiecesName.White) {
-                                    setCapturedWhitePieces((prev) => [...prev, attackedPiece]);
+                                    setCapturedWhitePieces((prev) => [...prev, attackedPiece!]);
                                 } else {
-                                    setCapturedBlackPieces((prev) => [...prev, attackedPiece]);
+                                    setCapturedBlackPieces((prev) => [...prev, attackedPiece!]);
                                 }
                             }
                         }
@@ -347,9 +354,10 @@ function changebitboard(row: number, column: number, piece: PieceType) {
 
     // Atualizar bitboards
     bitboards[piece.type] = (bitboards[piece.type] | newposition) & oldposition;
-    // console.log("bitboards[piece.type]: " + bitboards[piece.type].toString(2));
+    console.log("bitboards[piece.type]: " + bitboards[piece.type].toString(2).padStart(64));
     
     bitboards[piece.color] = (bitboards[piece.color] | newposition) & oldposition;
+    console.log("bitboards[piece.color]: " + bitboards[piece.color].toString(2).padStart(64));
 }
 
 function stringToBoardMatrix(bitString:string) {

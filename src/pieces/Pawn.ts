@@ -12,6 +12,8 @@ export default class Pawn extends PieceType{
 
         console.log("y: " + y + " newY: " + newY );
 
+        if(this.isAnAttack(newX, newY, currentState)) return true;
+
         if(!(currentState.isYourTurn(this.color))) return false;
 
         if (!(this.isPathClean(newX, newY, board))) return false; 
@@ -28,5 +30,6 @@ export default class Pawn extends PieceType{
         
         return false;
     }
+
 
 }

@@ -23,14 +23,28 @@ export abstract class PieceType{
         const x: number = this.x;
         const y: number = this.y;
 
+
         const Enemy: PiecesName = this.getEnemyColor();
+        const yInitialEnemy: number = (Enemy === PiecesName.White) ? 1 : 6;
         const EnemyBoard: bigint = currentState.boards[Enemy];
 
-        const mask = BigInt(1) << BigInt( 8 * newY + newX);
+        const validPosition: boolean = (newX === x + 1 || newX === x - 1) && (newY === y + 1 || newY === y - 1);
         
-        if((EnemyBoard & mask) !== BigInt(0)){
-            return true;
+        console.log(currentState.boards[Enemy].toString(2).padStart(64).padEnd(64));
+        
+        if(validPosition){
+            let mask = BigInt(1) << BigInt(8 * newY + newX);
+            let haveAnEnemy: boolean = ((EnemyBoard & mask) !== BigInt(0));
+            if (haveAnEnemy) return true;
+            
+            let validEnPassant = (yInitialEnemy + 1 === newY) || (yInitialEnemy - 1 === newY); 
+            newY = (Enemy === PiecesName.White) ? newY + 1 : newY - 1;
+            mask = BigInt(1) << BigInt( 8 * newY + newX);
+            haveAnEnemy = ((EnemyBoard & mask) !== BigInt(0));
+            if(validEnPassant && haveAnEnemy) return true;
+
         }
+        
         return false;
     }
 
