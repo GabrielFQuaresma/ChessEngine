@@ -13,7 +13,7 @@ import Bishop from '../../pieces/Bishop';
 import State from '../../auxiliar/State';
 
 
-const CHESSBOARD_SIZE = 600;
+const CHESSBOARD_SIZE = 560;
 const TILE_SIZE = CHESSBOARD_SIZE / 8;
 
 
@@ -199,8 +199,8 @@ export default function Chessboard() {
         const element = e.target as HTMLElement;
         const chessboard = chessboardRef.current;
         if(element.classList.contains("chess-piece") && chessboard){
-            setGridX(Math.floor((600 - (e.clientX - chessboard.offsetLeft))/75));
-            setGridY(Math.floor((600 - (e.clientY - chessboard.offsetTop))/75));
+            setGridX(Math.floor((CHESSBOARD_SIZE - (e.clientX - chessboard.offsetLeft))/TILE_SIZE));
+            setGridY(Math.floor((CHESSBOARD_SIZE - (e.clientY - chessboard.offsetTop))/TILE_SIZE));
 
             const x = e.clientX - 30;
             const y = e.clientY - 30;

@@ -32,9 +32,9 @@
 
 #chessboard {
     display: grid;
-    grid-template-columns: repeat(8, 75px);
-    grid-template-rows: repeat(8, 75px);
-    width: 600px;   
-    height: 600px;
+    grid-template-columns: repeat(8, 70px);
+    grid-template-rows: repeat(8, 70px);
+    width: 560px;   
+    height: 560px;
     background-color: #779556;
 }
