@@ -91,68 +91,85 @@ export default function Chessboard() {
     const [gridY, setGridY] = useState(0);
     const [pieces, setPieces] = useState<PieceType[]>(initialBoardState);
 
-    const [capturedWhitePieces, setCapturedWhitePieces] = useState<PieceType[]>([]);
-    const [capturedBlackPieces, setCapturedBlackPieces] = useState<PieceType[]>([]);
+    const [whiteCaptures, setWhiteCaptures] = useState<PieceType[]>([]);
+    const [blackCaptures, setBlackCaptures] = useState<PieceType[]>([]);
 
+    // Compute point totals from captured pieces using pieceValues mapping
+    const whiteCapturedValue = whiteCaptures.reduce((acc, piece) => acc + pieceValues[piece.type], 0);
+    const blackCapturedValue = blackCaptures.reduce((acc, piece) => acc + pieceValues[piece.type], 0);
+    const diff = Math.abs(whiteCapturedValue - blackCapturedValue);
 
     const chessboardRef = useRef<HTMLDivElement>(null);
     
+    function updatePiecesPosition(
+        oldPieces: PieceType[],
+        currentPiece: PieceType,
+        newX: number,
+        newY: number,
+        attackedPiece?: PieceType
+    ): PieceType[] {
+        return oldPieces
+            .map(piece => {
+                if (piece === currentPiece) {
+                    changebitboard(newX, newY, piece);
+                    currentState.changeState(bitboards);
+                    piece.x = newX;
+                    piece.y = newY;
+                    return piece;
+                }
+                if (attackedPiece && piece === attackedPiece) return undefined;
+                return piece;
+            })
+            .filter((p): p is PieceType => p != null);
+    }
+
     function dropPiece(e: React.MouseEvent) {
         const chessboard = chessboardRef.current;
         if (activePiece && chessboard) {
             const positionX = Math.floor((CHESSBOARD_SIZE - (e.clientX - chessboard.offsetLeft)) / TILE_SIZE);
             const positionY = Math.floor((CHESSBOARD_SIZE - (e.clientY - chessboard.offsetTop)) / TILE_SIZE);
     
-            // Identifica as peças envolvidas
             const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
             let attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY);
     
-
             if (currentPiece) {
                 const validMove = currentPiece.isValidMove(positionX, positionY, currentState);
-
-                //Necessário pro En Passant
-                if(!attackedPiece){
-                    if(currentPiece.isAnAttack(positionX, positionY, currentState)){
-                        const colorDiff = (currentPiece.getEnemyColor() === PiecesName.White) ? 1 : -1; 
-                        attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY + colorDiff);
-                    }
-                }
-
-                if (validMove) {
-                    // Atualiza as peças no estado
-                    const updatedPieces = pieces.reduce((results, piece) => {
-                        if (piece === currentPiece) {
-                            // Move a peça ativa
-                            changebitboard(positionX, positionY, piece);
-                            currentState.changeState(bitboards);
-                            piece.x = positionX;
-                            piece.y = positionY;
-                            results.push(piece);
-                        } else if (piece !== attackedPiece) {
-                            // Mantém as outras peças, exceto a atacada
-                            results.push(piece);
-                        }
-                        else{
-                            if (attackedPiece) {
-                                let pieceValue = pieceValues[attackedPiece.type];
-                                if (attackedPiece.color === PiecesName.White) {
-                                    WhitePoints += pieceValue;
-                                    setCapturedWhitePieces((prev) => [...prev, attackedPiece!]);
-                                } else {
-                                    BlackPoints += pieceValue;
-                                    setCapturedBlackPieces((prev) => [...prev, attackedPiece!]);
-                                }
-                            }
-                            Diff = Math.abs(WhitePoints - BlackPoints);
-                            console.log(Diff);
-                        }
-                        return results;
-                    }, [] as PieceType[]);
     
-                    setPieces(updatedPieces);
+                // En passant logic if needed...
+                if(!attackedPiece && currentPiece.isAnAttack(positionX, positionY, currentState)){
+                    const colorDiff = (currentPiece.getEnemyColor() === PiecesName.White) ? 1 : -1;
+                    attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY + colorDiff);
+                }
+    
+                if (validMove) {
+                    // For castling, additional logic can update the rook position.
+                    if (currentPiece instanceof King && Math.abs(positionX - currentPiece.x) === 2) {
+                        const rookX = (positionX === 2) ? 0 : 7;
+                        const newRookX = (positionX === 2) ? 3 : 5;
+                        const rook = pieces.find((p) => p.x === rookX && p.y === currentPiece.y);
+                        if (rook) {
+                            changebitboard(newRookX, currentPiece.y, rook);
+                            // currentState.movePiece(rook, newRookX, currentPiece.y);
+                            rook.x = newRookX;
+                        }
+                    }
+                    // If a piece is captured, update captured pieces arrays.
+                    if (attackedPiece) {
+                        if (currentPiece.color === PiecesName.White) {
+                            setWhiteCaptures(prev =>
+                                attackedPiece ? [...prev, attackedPiece] : prev
+                            );
+                        } else {
+                            setBlackCaptures(prev =>
+                                attackedPiece ? [...prev, attackedPiece] : prev
+                            );
+                        }
+                    }
+                    // Update the pieces variable in one call.
+                    setPieces(prev => updatePiecesPosition(prev, currentPiece, positionX, positionY, attackedPiece));
+                    // Change the turn after a valid move.
+                    currentState.changeTurn();
                 } else {
-                    // Restaura a posição inicial da peça se o movimento não for válido
                     if (activePiece) {
                         activePiece.style.position = 'relative';
                         activePiece.style.removeProperty('top');
@@ -160,8 +177,6 @@ export default function Chessboard() {
                     }
                 }
             }
-    
-            // Remove o estilo da peça ativa e redefine o estado
             setActivePiece(null);
         }
     }
@@ -237,8 +252,7 @@ export default function Chessboard() {
         <>
             <div className="captured-pieces-container">
                 <div className="captured-pieces white-captured">
-                    {WhitePoints > BlackPoints && <span className="diff-display">{Diff}</span>}
-                    {capturedWhitePieces.map((piece, index) => (
+                    {whiteCaptures.map((piece, index) => (
                         <img key={index} src={piece.image} alt="Captured white piece" />
                     ))}
                 </div>
@@ -254,8 +268,7 @@ export default function Chessboard() {
             </div>
             <div className="captured-pieces-container">
                 <div className="captured-pieces black-captured">
-                    {BlackPoints > WhitePoints && <span className="diff-display">{Diff}</span>}
-                    {capturedBlackPieces.map((piece, index) => (
+                    {blackCaptures.map((piece, index) => (
                         <img key={index} src={piece.image} alt="Captured black piece" />
                     ))}
                 </div>

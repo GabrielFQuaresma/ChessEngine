@@ -1,8 +1,6 @@
 .captured-pieces-container {
     display: flex;
     justify-content: start;
-    margin-bottom: 20px; /* Para as peças brancas capturadas acima do tabuleiro */
-    margin-top: 20x; /* Para as peças pretas capturadas abaixo do tabuleiro */
 }
 
 .captured-pieces {
@@ -16,14 +14,7 @@
 }
 
 .diff-display {
-    font-size: 25px;
-    font-weight: bold;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color: #ffffff;
-    margin-right: 10px; /* Espaço entre o número e as peças */
-    align-self: center;
 }
-
 
 .captured-pieces img {
     width: 50px;
