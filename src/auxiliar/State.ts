@@ -85,6 +85,14 @@ export default class State {
         return pieces;
     }
 
+    
+
+    removePiece(piece: PieceType): void {
+        const positionMask = BigInt(1) << BigInt(8 * piece.y + piece.x);
+        this.boards[piece.color] &= ~positionMask;
+        this.boards[piece.type] &= ~positionMask;
+    }
+
     movePiece(piece: PieceType, newX: number, newY: number): void {
         const oldPosition = BigInt(1) << BigInt(8 * piece.y + piece.x);
         const newPosition = BigInt(1) << BigInt(8 * newY + newX);
@@ -96,5 +104,7 @@ export default class State {
         // Update the piece's coordinates
         piece.x = newX;
         piece.y = newY;
+
+        this.currentTurn = (this.currentTurn === colors.white) ? colors.black : colors.white;
     }
 }
