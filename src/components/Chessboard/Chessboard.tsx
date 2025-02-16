@@ -111,8 +111,6 @@ export default function Chessboard() {
         return oldPieces
             .map(piece => {
                 if (piece === currentPiece) {
-                    changebitboard(newX, newY, piece);
-                    currentState.changeState(bitboards);
                     piece.x = newX;
                     piece.y = newY;
                     return piece;
@@ -123,29 +121,35 @@ export default function Chessboard() {
             .filter((p): p is PieceType => p != null);
     }
 
+    // function removePieceFromBitboard(piece: PieceType) {
+    //     const positionMask = BigInt(1) << BigInt(8 * piece.y + piece.x);
+    //     bitboards[piece.color] &= ~positionMask;
+    //     bitboards[piece.type] &= ~positionMask;
+    // }
+
     function dropPiece(e: React.MouseEvent) {
         const chessboard = chessboardRef.current;
         if (activePiece && chessboard) {
-            const positionX = Math.floor((CHESSBOARD_SIZE - (e.clientX - chessboard.offsetLeft)) / TILE_SIZE);
-            const positionY = Math.floor((CHESSBOARD_SIZE - (e.clientY - chessboard.offsetTop)) / TILE_SIZE);
+            const newX = Math.floor((CHESSBOARD_SIZE - (e.clientX - chessboard.offsetLeft)) / TILE_SIZE);
+            const newY = Math.floor((CHESSBOARD_SIZE - (e.clientY - chessboard.offsetTop)) / TILE_SIZE);
     
             const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
-            let attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY);
+            let attackedPiece = pieces.find((p) => p.x === newX && p.y === newY);
     
             if (currentPiece) {
-                const validMove = currentPiece.isValidMove(positionX, positionY, currentState);
+                const validMove = currentPiece.isValidMove(newX, newY, currentState);
     
                 // En passant logic if needed...
-                if(!attackedPiece && currentPiece.isAnAttack(positionX, positionY, currentState)){
+                if(!attackedPiece && currentPiece.isAnAttack(newX, newY, currentState)){
                     const colorDiff = (currentPiece.getEnemyColor() === PiecesName.White) ? 1 : -1;
-                    attackedPiece = pieces.find((p) => p.x === positionX && p.y === positionY + colorDiff);
+                    attackedPiece = pieces.find((p) => p.x === newX && p.y === newY + colorDiff);
                 }
     
                 if (validMove) {
                     // For castling, additional logic can update the rook position.
-                    if (currentPiece instanceof King && Math.abs(positionX - currentPiece.x) === 2) {
-                        const rookX = (positionX === 2) ? 0 : 7;
-                        const newRookX = (positionX === 2) ? 3 : 5;
+                    if (currentPiece instanceof King && Math.abs(newX - currentPiece.x) === 2) {
+                        const rookX = (newX === 2) ? 0 : 7;
+                        const newRookX = (newX === 2) ? 3 : 5;
                         const rook = pieces.find((p) => p.x === rookX && p.y === currentPiece.y);
                         if (rook) {
                             changebitboard(newRookX, currentPiece.y, rook);
@@ -155,6 +159,7 @@ export default function Chessboard() {
                     }
                     // If a piece is captured, update captured pieces arrays.
                     if (attackedPiece) {
+                        currentState.removePiece(attackedPiece);
                         if (currentPiece.color === PiecesName.White) {
                             setWhiteCaptures(prev =>
                                 attackedPiece ? [...prev, attackedPiece] : prev
@@ -166,9 +171,9 @@ export default function Chessboard() {
                         }
                     }
                     // Update the pieces variable in one call.
-                    setPieces(prev => updatePiecesPosition(prev, currentPiece, positionX, positionY, attackedPiece));
+                    setPieces(prev => updatePiecesPosition(prev, currentPiece, newX, newY, attackedPiece));
                     // Change the turn after a valid move.
-                    currentState.changeTurn();
+                    currentState.movePiece(currentPiece, newX, newY);
                 } else {
                     if (activePiece) {
                         activePiece.style.position = 'relative';
