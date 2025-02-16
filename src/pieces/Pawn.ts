@@ -11,10 +11,10 @@ export default class Pawn extends PieceType{
         const board = currentState.getBoard();
 
         console.log("y: " + y + " newY: " + newY );
+        
+        if(!(currentState.isYourTurn(this.color))) return false;
 
         if(this.isAnAttack(newX, newY, currentState)) return true;
-
-        if(!(currentState.isYourTurn(this.color))) return false;
 
         if (!(this.isPathClean(newX, newY, board))) return false; 
 
