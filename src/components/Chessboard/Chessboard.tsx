@@ -214,6 +214,7 @@ export default function Chessboard() {
             
         }
     }
+    
 
     function grabPiece(e: React.MouseEvent){
         const element = e.target as HTMLElement;
@@ -255,10 +256,11 @@ export default function Chessboard() {
     }
     return (
         <>
+
             <div className="captured-pieces-container">
-                <div className="captured-pieces white-captured">
-                    {whiteCaptures.map((piece, index) => (
-                        <img key={index} src={piece.image} alt="Captured white piece" />
+                <div className="captured-pieces black-captured">
+                    {blackCaptures.map((piece, index) => (
+                        <img key={index} src={piece.image} alt="Captured black piece" />
                     ))}
                 </div>
             </div>
@@ -272,9 +274,9 @@ export default function Chessboard() {
                 {board}
             </div>
             <div className="captured-pieces-container">
-                <div className="captured-pieces black-captured">
-                    {blackCaptures.map((piece, index) => (
-                        <img key={index} src={piece.image} alt="Captured black piece" />
+                <div className="captured-pieces white-captured">
+                    {whiteCaptures.map((piece, index) => (
+                        <img key={index} src={piece.image} alt="Captured white piece" />
                     ))}
                 </div>
             </div>
