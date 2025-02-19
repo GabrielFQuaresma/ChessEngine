@@ -144,8 +144,9 @@ export default function Chessboard() {
                     const colorDiff = (currentPiece.getEnemyColor() === PiecesName.White) ? 1 : -1;
                     attackedPiece = pieces.find((p) => p.x === newX && p.y === newY + colorDiff);
                 }
-    
-                if (validMove) {
+                
+                const isFriendlyFire : Boolean = currentPiece.color === attackedPiece?.color;
+                if (validMove && !isFriendlyFire) {
                     // For castling, additional logic can update the rook position.
                     if (currentPiece instanceof King && Math.abs(newX - currentPiece.x) === 2) {
                         const rookX = (newX === 2) ? 0 : 7;
@@ -157,9 +158,11 @@ export default function Chessboard() {
                             rook.x = newRookX;
                         }
                     }
+                    
                     // If a piece is captured, update captured pieces arrays.
                     if (attackedPiece) {
                         currentState.removePiece(attackedPiece);
+                        
                         if (currentPiece.color === PiecesName.White) {
                             setWhiteCaptures(prev =>
                                 attackedPiece ? [...prev, attackedPiece] : prev
