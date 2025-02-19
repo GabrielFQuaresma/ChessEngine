@@ -16,7 +16,6 @@
     margin-top: 10px;
 }
 
-
 .captured-pieces img {
     width: 40px;
     height: 40px;
@@ -29,4 +28,11 @@
     width: 560px;   
     height: 560px;
     background-color: #779556;
+}
+
+.diff-display {
+    color: #ffffff;
+    font-size: 15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: bold;
 }
