@@ -53,11 +53,10 @@ export abstract class PieceType{
         const directionRow = Math.sign(newY - this.y);
         const directionCol = Math.sign(newX - this.x);
 
-        
         let currentRow = this.y + directionRow;
         let currentCol = this.x + directionCol;
         
-        do {
+        while (currentRow !== newY || currentCol !== newX) {
             const bitPosition = 8 * currentRow + currentCol;
             const mask = BigInt(1) << BigInt(bitPosition);
             
@@ -68,7 +67,7 @@ export abstract class PieceType{
             // Move to the next square in the direction
             currentRow += directionRow;
             currentCol += directionCol;
-        } while ((currentRow !== (newY  + directionRow) || currentCol !== (newX + directionCol)));
+        }
 
         return true;
     }
